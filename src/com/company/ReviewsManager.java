@@ -38,11 +38,13 @@ public class ReviewsManager {
         tmp = document.select("li[class$=neut]").select("b").last();
         neutral = Integer.parseInt(tmp == null ? "0" : tmp.text());
         total = positive + neutral + negative;
+        System.out.println("Grabbed amount of reviews : " + total);
         return total;
     }
 
     public List<Pair<String, String>> getAllReviews() {
         int reviewsPages = (int) Math.ceil(((double) total) / 100);
+        total = 0;
         List<Pair<String, String>> result = getReviews(document);
         for (int i = 2; i <= reviewsPages; i++) {
             result.addAll(getReviews(download("https://www.kinopoisk.ru/film/" + ID + "/ord/rating/perpage/100/page/" + i + "/#list")));
@@ -63,18 +65,15 @@ public class ReviewsManager {
     private List<Pair<String, String>> getReviews(Document document) {
         List<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
         Elements responses = document.select("div[itemprop=reviews]");
+        int counter = 0;
         for (Element review : responses) {
-            result.add(new Pair<>("",review.select("table").text()));
+            String kclass = review.className().replace("response ", "");
+            result.add(new Pair<>(kclass, review.select("table").text()));
+            counter++;
         }
+        total += counter;
+        System.out.println("Grabbed " + counter + "revievs. Total now is " + total + ".");
         return result;
-    }
-
-    public String[] getBadRevs() {
-        return new String[0];
-    }
-
-    public String[] getGoodRevs() {
-        return null;
     }
 
     private void initSslSkipping() {
