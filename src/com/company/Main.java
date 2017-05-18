@@ -4,15 +4,18 @@ import javafx.util.Pair;
 
 import java.io.*;
 import java.util.*;
-
+import static spark.Spark.*;
 
 public class Main {
     private static final String ID = "342";
     private static final String DEVIDING_STRING = " метростроение достопримечательность ";
     private static final String PARSED_DEVIDING_STRING = "\\{метростроение\\}\\{достопримечательность\\}";
 
+    public static void main(String[] args) {
+        get("/hello", (req, res) -> "Hello World");
+    }
 
-    public static void main(String[] args) throws IOException {
+   /* public static void main(String[] args) throws IOException {
         ReviewsManager reviewsManager = new ReviewsManager(ID);
         reviewsManager.downloadContent();
         Integer revsAmount = reviewsManager.getReviewsAmount();
@@ -21,7 +24,7 @@ public class Main {
         Runtime.getRuntime().exec("./mystem -ld input output");
         DocsManager docsManager = new DocsManager();
         docsManager.attachDocs(prepareDocs());
-    }
+    }*/
 
     private static List<Doc> prepareDocs() throws IOException {
         return readRevs();
