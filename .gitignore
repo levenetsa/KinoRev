@@ -1,5 +1,4 @@
 
-out/artifacts/KinoRev_jar/KinoRev.jar
-out/production/KinoRev/com/company/Doc.class
+out/*
 *.class
 *.MF
