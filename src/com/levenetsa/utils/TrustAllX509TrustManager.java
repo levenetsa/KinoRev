@@ -1,4 +1,4 @@
-package com.company;
+package com.levenetsa.utils;
 
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;

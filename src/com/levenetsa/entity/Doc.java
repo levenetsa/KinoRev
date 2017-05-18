@@ -1,4 +1,4 @@
-package com.company;
+package com.levenetsa.entity;
 
 public class Doc {
     private String description;

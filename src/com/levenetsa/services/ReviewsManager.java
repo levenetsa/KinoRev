@@ -1,5 +1,6 @@
-package com.company;
+package com.levenetsa.services;
 
+import com.levenetsa.utils.TrustAllX509TrustManager;
 import javafx.util.Pair;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

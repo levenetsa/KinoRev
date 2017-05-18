@@ -1,4 +1,6 @@
-package com.company;
+package com.levenetsa.services;
+
+import com.levenetsa.entity.Doc;
 
 import java.util.ArrayList;
 import java.util.List;

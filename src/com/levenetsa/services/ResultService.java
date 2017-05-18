@@ -1,21 +1,51 @@
-package com.company;
+package com.levenetsa.services;
 
+import com.levenetsa.dao.FilmDao;
+import com.levenetsa.dao.ResultDao;
+import com.levenetsa.entity.Doc;
+import com.levenetsa.entity.Film;
 import javafx.util.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.*;
-import static spark.Spark.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class Main {
+public class ResultService {
+    private Logger logger;
+    private FilmDao filmDao;
+    private ResultDao resultDao;
+
+    public ResultService() {
+        logger = LoggerFactory.getLogger(this.getClass());
+        filmDao = new FilmDao();
+        resultDao = new ResultDao();
+    }
+
+    public String getResult(Integer id) {
+        logger.info("Request for film with id " + id);
+        String result = resultDao.getById(id);
+        if (result != null) {
+            logger.info("Result already exists");
+            return result;
+        } else {
+            logger.info("Result does NOT exist");
+            if (filmDao.getById(id) == null) {
+                logger.info("Film does NOT exist");
+            } else {
+                logger.info("Film exists. Running script.py");
+            }
+        }
+        return id.toString();
+    }
+
     private static final String ID = "342";
     private static final String DEVIDING_STRING = " метростроение достопримечательность ";
     private static final String PARSED_DEVIDING_STRING = "\\{метростроение\\}\\{достопримечательность\\}";
 
-    public static void main(String[] args) {
-        get("/hello", (req, res) -> "Hello World");
-    }
-
-   /* public static void main(String[] args) throws IOException {
+    public static void maan(String[] args) throws IOException {
         ReviewsManager reviewsManager = new ReviewsManager(ID);
         reviewsManager.downloadContent();
         Integer revsAmount = reviewsManager.getReviewsAmount();
@@ -24,7 +54,7 @@ public class Main {
         Runtime.getRuntime().exec("./mystem -ld input output");
         DocsManager docsManager = new DocsManager();
         docsManager.attachDocs(prepareDocs());
-    }*/
+    }
 
     private static List<Doc> prepareDocs() throws IOException {
         return readRevs();
@@ -42,10 +72,10 @@ public class Main {
         List<Doc> documents = new ArrayList<>();
         while ((val = br.readLine()) != null) {
             srt = val.replace("?", "").split(PARSED_DEVIDING_STRING);
-            for (String s : srt){
+            for (String s : srt) {
                 s = s.substring(1, s.length() - 1);
                 String[] localStrs = s.split("\\}\\{");
-                Doc currentDoc = new Doc(localStrs[localStrs.length-1], Arrays.copyOf(localStrs, localStrs.length-1));
+                Doc currentDoc = new Doc(localStrs[localStrs.length - 1], Arrays.copyOf(localStrs, localStrs.length - 1));
                 documents.add(currentDoc);
             }
         }
