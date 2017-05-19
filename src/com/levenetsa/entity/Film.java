@@ -32,4 +32,8 @@ public class Film{
     public void setLastFetched(Timestamp lastFetched) {
         this.lastFetched = lastFetched;
     }
+
+    public String toJsonp() {
+        return "{id: " + id + ", name:\"name\"}";
+    }
 }

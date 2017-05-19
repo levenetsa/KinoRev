@@ -8,6 +8,8 @@ import java.util.List;
 
 public class FilmDao implements Dao<Film> {
 
+    private List<Film> byPartOfName;
+
     @Override
     public Film parseResult(ResultSet rs) throws SQLException {
         Film film = new Film();
@@ -20,5 +22,9 @@ public class FilmDao implements Dao<Film> {
     public Film getById(Integer id) {
         List<Film> results = executeQuery("SELECT * FROM films WHERE id = " + id);
         return results.size() == 1 ? results.get(0) : null;
+    }
+
+    public List<Film> getByPartOfName(String part) {
+        return executeQuery("SELECT * FROM films WHERE name LIKE '" + part +"'");
     }
 }

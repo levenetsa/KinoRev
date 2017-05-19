@@ -3,25 +3,25 @@
     <output-path>$PROJECT_DIR$/out/artifacts/KinoRev_jar</output-path>
     <root id="archive" name="KinoRev.jar">
       <element id="module-output" name="KinoRev" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/spark-core-2.5.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-http-9.3.6.v20151106.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/slf4j-simple-1.7.13.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/javax.servlet-api-3.1.0.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/slf4j-api-1.7.13.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/spark-core-2.5.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/websocket-api-9.3.6.v20151106.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/mysql-connector-java-5.1.42-bin.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-webapp-9.3.6.v20151106.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-server-9.3.6.v20151106.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/slf4j-api-1.7.13.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jsoup-1.10.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/websocket-client-9.3.6.v20151106.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-io-9.3.6.v20151106.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-security-9.3.6.v20151106.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-jmx-9.3.6.v20151106.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-xml-9.3.6.v20151106.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/websocket-servlet-9.3.6.v20151106.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jsoup-1.10.2.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-server-9.3.6.v20151106.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-jmx-9.3.6.v20151106.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/websocket-server-9.3.6.v20151106.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-io-9.3.6.v20151106.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-http-9.3.6.v20151106.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-servlet-9.3.6.v20151106.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-webapp-9.3.6.v20151106.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-security-9.3.6.v20151106.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jetty-util-9.3.6.v20151106.jar" path-in-jar="/" />
-      <element id="extracted-dir" path="$PROJECT_DIR$/lib/websocket-api-9.3.6.v20151106.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/lib/slf4j-simple-1.7.13.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

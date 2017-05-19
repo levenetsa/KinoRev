@@ -16,9 +16,9 @@ public interface Dao<T> {
     default List<T> executeQuery(String sql) {
         Logger logger = LoggerFactory.getLogger(this.getClass());
         final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-        final String DB_URL = "jdbc:mysql://localhost:3306/kpra?useSSL=false";
+        final String DB_URL = "jdbc:mysql://priv/kpra?useSSL=false";
         final String USER = "root";
-        final String PASS = "240595";
+        final String PASS = "lolkekcheburek";
 
         Connection conn = null;
         Statement stmt = null;
