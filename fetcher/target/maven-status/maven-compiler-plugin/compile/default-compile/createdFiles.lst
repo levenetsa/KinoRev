@@ -1,0 +1,13 @@
+com/levenetsa/fetcher/entity/Film.class
+com/levenetsa/fetcher/dao/Dao.class
+com/levenetsa/fetcher/App.class
+com/levenetsa/fetcher/services/DocsManager.class
+com/levenetsa/fetcher/dao/FilmDao.class
+com/levenetsa/fetcher/entity/Result.class
+com/levenetsa/fetcher/dao/ResultDao.class
+com/levenetsa/fetcher/services/ReviewsManager$1.class
+com/levenetsa/fetcher/services/ReviewsManager.class
+com/levenetsa/fetcher/services/SearchService.class
+com/levenetsa/fetcher/entity/Doc.class
+com/levenetsa/fetcher/services/ResultService.class
+com/levenetsa/fetcher/utils/TrustAllX509TrustManager.class

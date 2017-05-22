@@ -1,0 +1,12 @@
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/entity/Doc.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/services/DocsManager.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/services/SearchService.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/entity/Result.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/services/ReviewsManager.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/utils/TrustAllX509TrustManager.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/dao/ResultDao.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/dao/Dao.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/dao/FilmDao.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/entity/Film.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/App.java
+/Users/alekseylevenets/Documents/git/KinoRev/fetcher/src/main/java/com/levenetsa/fetcher/services/ResultService.java
