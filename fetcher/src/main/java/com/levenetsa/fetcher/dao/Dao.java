@@ -18,7 +18,7 @@ public interface Dao<T> {
         final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
         final String DB_URL = "jdbc:mysql://localhost:3306/kpra";
         final String USER = "root";
-        final String PASS = "240595sS1";
+        final String PASS = "dummyAss";
         Connection conn = null;
         Statement stmt = null;
         List<T> result = new ArrayList<>();
