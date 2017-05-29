@@ -25,6 +25,7 @@ public class FilmDao implements Dao<Film> {
     }
 
     public List<Film> getByPartOfName(String part) {
-        return executeQuery("SELECT * FROM films WHERE name LIKE '%" + part +"%'");
+        String searchString = "SELECT * FROM films WHERE name LIKE '%" + part +"%'";
+        return executeQuery(searchString);
     }
 }

@@ -34,6 +34,6 @@ public class Film{
     }
 
     public String toJsonp() {
-        return "{id: " + id + ", name:\"" + name + "\"}";
+        return "\"" + name + "\"";//"{id: " + id + ", name:\"" + name + "\"}";
     }
 }

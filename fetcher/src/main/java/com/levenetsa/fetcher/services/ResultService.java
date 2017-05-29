@@ -41,6 +41,10 @@ public class ResultService {
         return id.toString();
     }
 
+    public Object getResultByName(String params) {
+        return null;
+    }
+
     private static final String ID = "342";
     private static final String DEVIDING_STRING = " метростроение достопримечательность ";
     private static final String PARSED_DEVIDING_STRING = "\\{метростроение\\}\\{достопримечательность\\}";

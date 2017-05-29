@@ -16,9 +16,9 @@ public interface Dao<T> {
     default List<T> executeQuery(String sql) {
         Logger logger = LoggerFactory.getLogger(this.getClass());
         final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-        final String DB_URL = "jdbc:mysql://localhost:3306/kpra";
+        final String DB_URL = "jdbc:mysql://localhost:3306/kpra?useUnicode=yes&characterEncoding=cp866";
         final String USER = "root";
-        final String PASS = "dummyAss";
+        final String PASS = "2dummy42";
         Connection conn = null;
         Statement stmt = null;
         List<T> result = new ArrayList<>();

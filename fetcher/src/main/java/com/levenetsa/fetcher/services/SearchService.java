@@ -18,13 +18,14 @@ public class SearchService {
 
     public String getResult(String partOfname){
         List<Film> films = filmDao.getByPartOfName(partOfname);
-        if (films.size() == 0) return ("showJsonp({})");
-        StringBuilder result = new StringBuilder("showJsonp([");
-        for (int i = 0; i < films.size(); i++){
+        if (films.size() == 0) return ("[\"empty\"]");
+        StringBuilder result = new StringBuilder("[");
+        int size = films.size() > 10 ? 9 : films.size();
+        for (int i = 0; i < size; i++){
             result.append(films.get(i).toJsonp()).append(",");
         }
         result.deleteCharAt(result.length() - 1);
-        result.append("])");
+        result.append("]");
         return result.toString();
     }
 }
