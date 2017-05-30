@@ -13,7 +13,6 @@ public class App {
         ResultService resultService = new ResultService();
         SearchService searchService = new SearchService();
         get("/:id", (req, res) -> resultService.getResult(Integer.parseInt(req.params(":id"))));
-        get("/i/:name", (req, res) -> resultService.getResultByName(req.params(":name")));
         get("/s/:name",  (req, res) -> searchService.getResult(req.params(":name")));
         options("/*",
                 (request, response) -> {

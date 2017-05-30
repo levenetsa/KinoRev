@@ -2,8 +2,8 @@ package com.levenetsa.fetcher.services;
 
 import com.levenetsa.fetcher.dao.FilmDao;
 import com.levenetsa.fetcher.dao.ResultDao;
+import com.levenetsa.fetcher.dao.ReviewDao;
 import com.levenetsa.fetcher.entity.Doc;
-import com.levenetsa.fetcher.entity.Film;
 import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +17,13 @@ public class ResultService {
     private Logger logger;
     private FilmDao filmDao;
     private ResultDao resultDao;
+    private ReviewDao reviewDao;
 
     public ResultService() {
         logger = LoggerFactory.getLogger(this.getClass());
         filmDao = new FilmDao();
         resultDao = new ResultDao();
+       // reviewDao = new ReviewDao();
     }
 
     public String getResult(Integer id) {
@@ -29,14 +31,17 @@ public class ResultService {
         String result = resultDao.getById(id);
         if (result != null) {
             logger.info("Result already exists");
-            return result;
+            return "{\"text\": \"" + result + "\"}";
         } else {
             logger.info("Result does NOT exist");
             if (filmDao.getById(id) == null) {
                 logger.info("Film does NOT exist");
-            } else {
-                logger.info("Film exists. Running script.py");
+                filmDao.addFilm(id);
             }
+            logger.info("Downloading reviews for film " + id);
+          //  reviewDao.downloadReviewsById(id);
+            logger.info("Film exists. Running script.py");
+
         }
         return id.toString();
     }
@@ -50,10 +55,10 @@ public class ResultService {
     private static final String PARSED_DEVIDING_STRING = "\\{метростроение\\}\\{достопримечательность\\}";
 
     public static void maan(String[] args) throws IOException {
-        ReviewsManager reviewsManager = new ReviewsManager(ID);
-        reviewsManager.downloadContent();
-        Integer revsAmount = reviewsManager.getReviewsAmount();
-        List<Pair<String, String>> reviews = reviewsManager.getAllReviews();
+        ReviewDao reviewDao = new ReviewDao(ID);
+        reviewDao.downloadContent();
+        Integer revsAmount = reviewDao.getReviewsAmount();
+        List<Pair<String, String>> reviews = reviewDao.getAllReviews();
         writeBuffered(reviews, 8196);
         Runtime.getRuntime().exec("./mystem -ld input output");
         DocsManager docsManager = new DocsManager();

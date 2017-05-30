@@ -1,5 +1,7 @@
-package com.levenetsa.fetcher.services;
+package com.levenetsa.fetcher.dao;
 
+import com.levenetsa.fetcher.entity.Result;
+import com.levenetsa.fetcher.entity.Review;
 import com.levenetsa.fetcher.utils.TrustAllX509TrustManager;
 import javafx.util.Pair;
 import org.jsoup.Jsoup;
@@ -11,10 +13,12 @@ import javax.net.ssl.*;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReviewsManager {
+public class ReviewDao implements Dao<Review>{
     private String ID;
     private Document document;
     private Integer positive;
@@ -22,8 +26,10 @@ public class ReviewsManager {
     private Integer neutral;
     private Integer total;
 
-    public ReviewsManager(String id) {
+    public ReviewDao(String id) {
         this.ID = id;
+        downloadContent();
+        getReviewsAmount();
     }
 
     public void downloadContent() {
@@ -49,16 +55,6 @@ public class ReviewsManager {
         List<Pair<String, String>> result = getReviews(document);
         for (int i = 2; i <= reviewsPages; i++) {
             result.addAll(getReviews(download("https://www.kinopoisk.ru/film/" + ID + "/ord/rating/perpage/100/page/" + i + "/#list")));
-        }
-        return result;
-    }
-
-    private Document download(String s) {
-        Document result = null;
-        try {
-            result = Jsoup.connect(s).get();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return result;
     }
@@ -91,5 +87,10 @@ public class ReviewsManager {
         } catch (NoSuchAlgorithmException | KeyManagementException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Review parseResult(ResultSet rs) throws SQLException {
+        return null;
     }
 }

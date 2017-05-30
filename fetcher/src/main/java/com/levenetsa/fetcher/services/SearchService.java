@@ -18,7 +18,7 @@ public class SearchService {
 
     public String getResult(String partOfname){
         List<Film> films = filmDao.getByPartOfName(partOfname);
-        if (films.size() == 0) return ("[\"empty\"]");
+        if (films.size() == 0) return ("[[\"empty\" , \"empty\"]]");
         StringBuilder result = new StringBuilder("[");
         int size = films.size() > 10 ? 9 : films.size();
         for (int i = 0; i < size; i++){

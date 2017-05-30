@@ -1,6 +1,8 @@
 package com.levenetsa.fetcher.dao;
 
 import com.levenetsa.fetcher.entity.Film;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,5 +29,11 @@ public class FilmDao implements Dao<Film> {
     public List<Film> getByPartOfName(String part) {
         String searchString = "SELECT * FROM films WHERE name LIKE '%" + part +"%'";
         return executeQuery(searchString);
+    }
+
+    public void addFilm(Integer id) {
+        Document document = download("https://www.kinopoisk.ru/film/" + id);
+        Element tmp = document.select("h1[class$=moviename-big]").last();//.text();
+        System.out.println(tmp.text());
     }
 }

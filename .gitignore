@@ -29,3 +29,4 @@ fetcher/.idea/modules.xml
 fetcher/.idea/workspace.xml
 fetcher/fetcher.iml
 .idea/workspace.xml
+*.jar
