@@ -2,7 +2,6 @@ package com.levenetsa.fetcher;
 
 import com.levenetsa.fetcher.services.ResultService;
 import com.levenetsa.fetcher.services.SearchService;
-import org.codehaus.jackson.map.util.JSONPObject;
 
 import static spark.Spark.*;
 
@@ -12,7 +11,7 @@ public class App {
         ResultService resultService = new ResultService();
         SearchService searchService = new SearchService();
         get("/:id", (req, res) -> resultService.getResult(Integer.parseInt(req.params(":id"))));
-        get("/s/:name",  (req, res) -> searchService.getResult(req.params(":name")));
+        get("/s/:name", (req, res) -> searchService.getResult(req.params(":name")));
         options("/*",
                 (request, response) -> {
 

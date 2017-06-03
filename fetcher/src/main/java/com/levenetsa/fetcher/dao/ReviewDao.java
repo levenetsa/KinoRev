@@ -1,20 +1,13 @@
 package com.levenetsa.fetcher.dao;
 
-import com.levenetsa.fetcher.entity.Result;
 import com.levenetsa.fetcher.entity.Review;
-import com.levenetsa.fetcher.utils.TrustAllX509TrustManager;
-import javafx.util.Pair;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.*;
 import java.io.*;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -94,7 +87,7 @@ public class ReviewDao implements Dao<Review> {
                 .append("','")
                 .append(review.getContent().replace("'", ""))
                 .append("'),"));
-        executeQuery(sql.toString().substring(0,sql.length() - 1));
+        executeQuery(sql.toString().substring(0, sql.length() - 1));
     }
 
     private String getMood(Review review) {
@@ -104,15 +97,15 @@ public class ReviewDao implements Dao<Review> {
         return "neut";
     }
 
-    private List<Review> mystem(List<Review> reviews){
+    private List<Review> mystem(List<Review> reviews) {
         try {
             writeBuffered(reviews);
-            Process p =Runtime.getRuntime().exec("./mystem -ld " + INPUT + " " + OUTPUT);
+            Process p = Runtime.getRuntime().exec("./mystem -ld " + INPUT + " " + OUTPUT);
             Long time = System.currentTimeMillis();
             p.waitFor();
             logger.info("spent for MyStem exec: " + (System.currentTimeMillis() - time));
             return readRevs(reviews);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return reviews;
@@ -121,7 +114,7 @@ public class ReviewDao implements Dao<Review> {
     private static void writeBuffered(List<Review> reviews) throws IOException {
         File file = new File(INPUT);
         BufferedWriter writer = new BufferedWriter(new FileWriter(file), BUFF_SIZE);
-        for (int i = 0; i < reviews.size(); i++){
+        for (int i = 0; i < reviews.size(); i++) {
             writer.write(reviews.get(i).getContent() + DEVIDING_STRING);
         }
         writer.flush();

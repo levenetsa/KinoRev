@@ -1,10 +1,8 @@
 package com.levenetsa.fetcher.entity;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 
-public class Film{
+public class Film {
     private Integer id;
     private String name;
     private Timestamp lastFetched;

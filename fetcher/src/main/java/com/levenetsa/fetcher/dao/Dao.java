@@ -1,7 +1,5 @@
 package com.levenetsa.fetcher.dao;
 
-//STEP 1. Import required packages
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -21,7 +19,7 @@ public interface Dao<T> {
         final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
         final String DB_URL = "jdbc:mysql://localhost:3306/kpra?useUnicode=yes&characterEncoding=cp866";
         final String USER = "root";
-        final String PASS = "240595sS1";
+        final String PASS = "240534567";
         Connection conn = null;
         Statement stmt = null;
         List<T> result = new ArrayList<>();

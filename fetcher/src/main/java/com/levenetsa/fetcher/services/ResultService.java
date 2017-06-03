@@ -3,16 +3,11 @@ package com.levenetsa.fetcher.services;
 import com.levenetsa.fetcher.dao.FilmDao;
 import com.levenetsa.fetcher.dao.ResultDao;
 import com.levenetsa.fetcher.dao.ReviewDao;
-import com.levenetsa.fetcher.entity.Doc;
 import com.levenetsa.fetcher.entity.Result;
 import com.levenetsa.fetcher.entity.Review;
-import javafx.util.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ResultService {
@@ -50,9 +45,9 @@ public class ResultService {
     private String countResult(List<Review> reviews, Integer id) {
         Result r = new Result();
         r.setFilmId(id);
-        if (reviews.size() == 0){
-            r.setText(NOT_ENOUGH_REVIEWS);}
-            else{
+        if (reviews.size() == 0) {
+            r.setText(NOT_ENOUGH_REVIEWS);
+        } else {
             r.setText("counted");
         }
         resultDao.save(r);

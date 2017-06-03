@@ -12,9 +12,8 @@ import java.util.List;
 
 public class FilmDao implements Dao<Film> {
     private Logger logger;
-    private List<Film> byPartOfName;
 
-    public FilmDao(){
+    public FilmDao() {
         logger = LoggerFactory.getLogger(this.getClass());
     }
 
@@ -33,7 +32,7 @@ public class FilmDao implements Dao<Film> {
     }
 
     public List<Film> getByPartOfName(String part) {
-        String searchString = "SELECT * FROM films WHERE name LIKE '%" + part +"%'";
+        String searchString = "SELECT * FROM films WHERE name LIKE '%" + part + "%'";
         return executeQuery(searchString);
     }
 
