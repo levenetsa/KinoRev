@@ -20,4 +20,10 @@ public class ResultDao implements Dao<Result>{
         List<Result> results = executeQuery("SELECT * FROM results WHERE film_id = " + id);
         return results.size() == 1 ? results.get(0).getText() : null;
     }
+
+    public void save(Result r) {
+        String sql = "INSERT INTO results (film_id, text) VALUE (" +
+        r.getFilmId() + ", '" + r.getText() + "')";
+        executeQuery(sql);
+    }
 }

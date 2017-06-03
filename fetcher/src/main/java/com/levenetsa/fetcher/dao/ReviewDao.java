@@ -8,9 +8,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
-import java.io.IOException;
+import java.io.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.ResultSet;
@@ -18,26 +20,36 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReviewDao implements Dao<Review>{
-    private String ID;
+public class ReviewDao implements Dao<Review> {
+    private static final String DEVIDING_STRING = " метростроение достопримечательность ";
+    private static final String PARSED_DEVIDING_STRING = "\\{метростроение}\\{достопримечательность}";
+    private static final String INPUT = "input";
+    private static final String OUTPUT = "output";
+    private static final Integer BUFF_SIZE = 8196;
+    private Logger logger;
+    private Integer ID;
     private Document document;
     private Integer positive;
     private Integer negative;
     private Integer neutral;
     private Integer total;
 
-    public void downloadReviewsFor(String id){
+    public List<Review> downloadReviewsFor(Integer id) {
+        logger = LoggerFactory.getLogger(this.getClass());
         this.ID = id;
         downloadContent();
-        getReviewsAmount();
+        countReviewsAmount();
+        List<Review> reviews = mystem(getAllReviews());
+        save(reviews);
+        return reviews;
     }
 
-    public void downloadContent() {
+    private void downloadContent() {
         //initSslSkipping();
         document = download("https://www.kinopoisk.ru/film/" + ID + "/ord/rating/perpage/100/#list");
     }
 
-    public Integer getReviewsAmount() {
+    private void countReviewsAmount() {
         Element tmp = document.select("li[class$=pos]").select("b").last();//.text();
         positive = Integer.parseInt(tmp == null ? "0" : tmp.text());
         tmp = document.select("li[class$=neg]").select("b").last();
@@ -45,48 +57,92 @@ public class ReviewDao implements Dao<Review>{
         tmp = document.select("li[class$=neut]").select("b").last();
         neutral = Integer.parseInt(tmp == null ? "0" : tmp.text());
         total = positive + neutral + negative;
-        System.out.println("Grabbed amount of reviews : " + total);
-        return total;
+        logger.info("Grabbed amount of reviews : " + total);
     }
 
-    public List<Pair<String, String>> getAllReviews() {
+    private List<Review> getAllReviews() {
         int reviewsPages = (int) Math.ceil(((double) total) / 100);
         total = 0;
-        List<Pair<String, String>> result = getReviews(document);
+        List<Review> result = getReviews(document);
         for (int i = 2; i <= reviewsPages; i++) {
             result.addAll(getReviews(download("https://www.kinopoisk.ru/film/" + ID + "/ord/rating/perpage/100/page/" + i + "/#list")));
         }
         return result;
     }
 
-    private List<Pair<String, String>> getReviews(Document document) {
-        List<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
+    private List<Review> getReviews(Document document) {
+        List<Review> result = new ArrayList<>();
         Elements responses = document.select("div[itemprop=reviews]");
-        int counter = 0;
         for (Element review : responses) {
-            String kclass = review.className().replace("response ", "");
-            result.add(new Pair<>(kclass, review.select("table").text()));
-            counter++;
+            Review r = new Review();
+            r.setFilm_id(ID);
+            r.setMood(review.className().replace("response ", ""));
+            r.setContent(review.select("table").text());
+            result.add(r);
         }
-        total += counter;
-        System.out.println("Grabbed " + counter + "revievs. Total now is " + total + ".");
+        total += result.size();
+        logger.info("Grabbed " + result.size() + "revievs. Total now is " + total + ".");
         return result;
     }
 
-    private void initSslSkipping() {
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
+    public void save(List<Review> reviews) {
+        StringBuilder sql = new StringBuilder("INSERT INTO reviews (film_id, mood, content) VALUES ");
+        reviews.forEach(review -> sql.append("(")
+                .append(review.getFilm_id())
+                .append(",'")
+                .append(getMood(review))
+                .append("','")
+                .append(review.getContent().replace("'", ""))
+                .append("'),"));
+        executeQuery(sql.toString().substring(0,sql.length() - 1));
+    }
 
-            sc.init(null, new TrustManager[]{new TrustAllX509TrustManager()}, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
-                public boolean verify(String string, SSLSession ssls) {
-                    return true;
-                }
-            });
-        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+    private String getMood(Review review) {
+        if (review.getMood().equals("good") || review.getMood().equals("bad")) {
+            return review.getMood();
+        }
+        return "neut";
+    }
+
+    private List<Review> mystem(List<Review> reviews){
+        try {
+            writeBuffered(reviews);
+            Process p =Runtime.getRuntime().exec("./mystem -ld " + INPUT + " " + OUTPUT);
+            Long time = System.currentTimeMillis();
+            p.waitFor();
+            logger.info("spent for MyStem exec: " + (System.currentTimeMillis() - time));
+            return readRevs(reviews);
+        } catch (Exception e){
             e.printStackTrace();
         }
+        return reviews;
+    }
+
+    private static void writeBuffered(List<Review> reviews) throws IOException {
+        File file = new File(INPUT);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file), BUFF_SIZE);
+        for (int i = 0; i < reviews.size(); i++){
+            writer.write(reviews.get(i).getContent() + DEVIDING_STRING);
+        }
+        writer.flush();
+        writer.close();
+    }
+
+    private static List<Review> readRevs(List<Review> reviews) throws IOException {
+        BufferedReader br = new BufferedReader(new FileReader(new File("output")));
+        String val;
+        StringBuilder sb = new StringBuilder("");
+        String[] srt;
+        while ((val = br.readLine()) != null) {
+            sb.append(val);
+        }
+        srt = sb.toString().replace("?", "").split(PARSED_DEVIDING_STRING);
+        for (int i = 0; i < reviews.size(); i++) {
+            String s = srt[i];
+            s = s.substring(1, s.length() - 1);
+            reviews.get(i).setContent(s.replace("}{", " "));
+        }
+        return reviews;
     }
 
     @Override

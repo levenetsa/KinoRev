@@ -8,7 +8,6 @@ import static spark.Spark.*;
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("hello");
         port(22456);
         ResultService resultService = new ResultService();
         SearchService searchService = new SearchService();
@@ -33,7 +32,6 @@ public class App {
 
                     return "OK";
                 });
-
         before((request, response) -> response.header("Access-Control-Allow-Origin", "*"));
     }
 }

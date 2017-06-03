@@ -1,8 +1,5 @@
 package com.levenetsa.fetcher.entity;
 
-/**
- * Created by alevenet on 30.05.2017.
- */
 public class Review {
     private Integer id;
     private Integer film_id;

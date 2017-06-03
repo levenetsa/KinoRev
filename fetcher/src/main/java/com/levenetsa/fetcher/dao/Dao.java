@@ -26,30 +26,25 @@ public interface Dao<T> {
         Statement stmt = null;
         List<T> result = new ArrayList<>();
         try {
-            logger.info("In connector: ");
             Class.forName(JDBC_DRIVER);
-            logger.info("    Trying to get connection");
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
-            logger.info("    Connected. Fetching for:");
-            logger.info("                  " + sql);
+            logger.info("Fetching for: " + sql.substring(0, sql.length() > 60 ? 60 : sql.length()));
             stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
-            while(rs.next()){
-                try {
-                    result.add(parseResult(rs));
-                }catch (Exception e){
-                    logger.error("Can NOT parse : " + rs.toString());
+            if (sql.contains("SELECT")) {
+                ResultSet rs = stmt.executeQuery(sql);
+                while (rs.next()) {
+                    try {
+                        result.add(parseResult(rs));
+                    } catch (Exception e) {
+                        logger.error("Can NOT parse : " + rs.toString());
+                    }
                 }
+                rs.close();
+            } else {
+                stmt.execute(sql);
             }
-            if (result.size() == 0) {
-                logger.info("    Empty answer");
-            }
-            rs.close();
             stmt.close();
             conn.close();
-            logger.info("    Connection closed");
-        } catch (SQLException se) {
-            se.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -57,6 +52,7 @@ public interface Dao<T> {
                 if (stmt != null)
                     stmt.close();
             } catch (SQLException se2) {
+                logger.error("Cannot close SQL connection!");
             }
             try {
                 if (conn != null)
@@ -71,7 +67,7 @@ public interface Dao<T> {
     default Document download(String s) {
         Document result = null;
         try {
-            result = Jsoup.connect(s).get();
+            result = Jsoup.connect(s).timeout(10_000).get();
         } catch (IOException e) {
             e.printStackTrace();
         }

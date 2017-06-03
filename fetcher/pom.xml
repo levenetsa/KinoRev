@@ -35,6 +35,15 @@
     </dependency>
   </dependencies>
   <build>
+  <resources>
+      <resource>
+          <directory>src/main/resources</directory>
+          <includes>
+              <include>mystem</include>
+          </includes>
+          <targetPath>..</targetPath>
+        </resource>
+    </resources>
     <plugins>
       <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
