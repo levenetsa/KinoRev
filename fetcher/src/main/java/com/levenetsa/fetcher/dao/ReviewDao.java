@@ -26,7 +26,7 @@ public class ReviewDao implements Dao<Review>{
     private Integer neutral;
     private Integer total;
 
-    public ReviewDao(String id) {
+    public void downloadReviewsFor(String id){
         this.ID = id;
         downloadContent();
         getReviewsAmount();
