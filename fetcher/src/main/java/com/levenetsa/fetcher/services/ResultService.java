@@ -3,6 +3,7 @@ package com.levenetsa.fetcher.services;
 import com.levenetsa.fetcher.dao.FilmDao;
 import com.levenetsa.fetcher.dao.ResultDao;
 import com.levenetsa.fetcher.dao.ReviewDao;
+import com.levenetsa.fetcher.entity.Context;
 import com.levenetsa.fetcher.entity.Result;
 import com.levenetsa.fetcher.entity.Review;
 import org.slf4j.Logger;
@@ -51,10 +52,13 @@ public class ResultService {
         if (reviews.size() == 0) {
             r.setText(NOT_ENOUGH_REVIEWS);
         } else {
-            putIntoFile(reviews);
-            r.setText("counted");
+            //putIntoFile(reviews);
+            Context filmContext = new Context(reviews);
+            filmContext.countTScore(2,200,0.3,-1D);
+            filmContext.countUslovn(2,200,2D,-1D);
+            r.setText(filmContext.getMostCallocated());
         }
-        resultDao.save(r);
+        //resultDao.save(r);
         return "{\"text\": \"" + r.getText() + "\"}";
     }
 
@@ -68,5 +72,10 @@ public class ResultService {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public String recountResult(int id) {
+        List<Review> reviews = reviewDao.getByFilmId(id);
+        return countResult(reviews, id);
     }
 }

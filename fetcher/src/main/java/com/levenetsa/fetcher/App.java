@@ -11,6 +11,7 @@ public class App {
         ResultService resultService = new ResultService();
         SearchService searchService = new SearchService();
         get("/:id", (req, res) -> resultService.getResult(Integer.parseInt(req.params(":id"))));
+        get("/recount/:id", (req, res) -> resultService.recountResult(Integer.parseInt(req.params(":id"))));
         get("/s/:name", (req, res) -> searchService.getResult(req.params(":name")));
         options("/*",
                 (request, response) -> {

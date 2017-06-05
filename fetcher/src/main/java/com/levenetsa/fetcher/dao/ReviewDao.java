@@ -138,8 +138,17 @@ public class ReviewDao implements Dao<Review> {
         return reviews;
     }
 
+    public List<Review> getByFilmId(int id){
+        return executeQuery("SELECT * FROM reviews WHERE film_id = " + id + ";");
+    }
+
     @Override
     public Review parseResult(ResultSet rs) throws SQLException {
-        return null;
+        Review review = new Review();
+        review.setId(rs.getInt("id"));
+        review.setFilm_id(rs.getInt("film_id"));
+        review.setContent(rs.getString("content"));
+        review.setMood(rs.getString("mood"));
+        return review;
     }
 }
