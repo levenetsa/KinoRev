@@ -13,8 +13,8 @@ public class Context {
     Integer uniqN;
     int[][] colloc;
     int[][] collocN;
-    double[][] collocUslovn;
-    double[][] collocTScore;
+    int[][] collocUslovn;
+    int[][] collocTScore;
     int[] word;
     String[] uniqWords;
     String[] words;
@@ -28,19 +28,18 @@ public class Context {
     public void countTScore(Integer mN, Integer N, Double mF, Double F) {
         if (tScore) return;
         if (!stats) countStats();
-        collocTScore = new double[uniqN][uniqN];
+        collocTScore = new int[uniqN][uniqN];
         for (int i = 0; i < uniqN; i++) {
             for (int j = 0; j < uniqN; j++) {
                 if ((N == -1 || word[i] < N && word[j] < N) && (mN == -1 || word[i] > mN && word[j] > mN)) {
                     double v = getTScore(i, j);
                     if ((mF == -1 || v >= mF) && (F == -1 || v <= F)) {
                         collocN[i][j]++;
-                        collocTScore[i][j] = v;
+                        collocTScore[i][j] = (int)(v * 100);
                     }
                 }
             }
         }
-
         tScore = true;
     }
 
@@ -52,14 +51,14 @@ public class Context {
     public void countUslovn(Integer mN, Integer N, Double mF, Double F) {
         if (uslovn) return;
         if (!stats) countStats();
-        collocUslovn = new double[uniqN][uniqN];
+        collocUslovn = new int[uniqN][uniqN];
         for (int i = 0; i < uniqN; i++) {
             for (int j = 0; j < uniqN; j++) {
                 if ((N == -1 || word[i] < N && word[j] < N) && (mN == -1 || word[i] > mN && word[j] > mN)) {
                     double v = ((double) colloc[i][j]) / word[j];
                     if ((mF == -1 || v >= mF) && (F == -1 || v <= F)) {
                         collocN[i][j]++;
-                        collocUslovn[i][j] = v;
+                        collocUslovn[i][j] = (int)(v * 100);
                     }
                 }
             }
@@ -70,7 +69,9 @@ public class Context {
     public void countStats() {
         if (stats) return;
         indexes = new HashMap<>();
-        words = (String[]) reviews.stream().flatMap(r -> Arrays.stream(r.getContent().split("\\s"))).toArray();
+        ArrayList<String> tmp = new ArrayList<>();
+        reviews.forEach(r -> tmp.addAll(Arrays.asList(r.getContent().split("\\s"))));
+        words = tmp.stream().toArray(String[]::new);
         uniqWords = new HashSet<>(Arrays.asList(words)).stream().toArray(String[]::new);
         uniqN = uniqWords.length;
         for (int i = 0; i < uniqN; i++) {
@@ -111,7 +112,12 @@ public class Context {
                 "очень", "минимально", "максимально", "абсолютно", "огромный", "предельно", "сильно", "слабо", "наиболее", "наименьшее", "самый",
                 "красивый", "мягкий", "удобный", "дорогой", "эффективный",
                 "является", "есть", "иметь", "хотеть", "содержаться", "существует",
-                "осуществлять", "оказывается", "можно"
+                "осуществлять", "оказывается", "можно",
+                "ни","P","S",
+                "б", "г", "д", "е", "ё", "ж", "з", "й", "л", "м", "н", "п", "р", "с", "т", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", "ь", "э", "ю",
+                "Б", "Г", "Д", "Е", "Ё", "Ж", "З", "Й", "Л", "М", "Н", "П", "Р", "С", "Т", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю",
+                "один", "два", "три", "пять", "шесть", "семь", "восемь", "девять", "и", "в",
+                "у", "о", "к"
         };
         for (String stop :
                 stopWords) {
@@ -127,13 +133,18 @@ public class Context {
 
     public String getMostCallocated() {
         StringBuilder sb = new StringBuilder("");
+        List<Col> list = new ArrayList<>();
         for (int i = 0; i < uniqN; i++) {
             for (int j = 0; j < uniqN; j++) {
                 if (collocN[i][j] == 2) {
-                    sb.append(uniqWords[i]).append(" ").append(uniqWords[j]).append("\n");
+                    list.add(new Col(i,j,collocTScore[i][j]));
+
                 }
             }
         }
+        list.stream().sorted((a,b) -> Integer.compare(b.v,a.v))
+                .limit(100).forEach(x -> sb.append(uniqWords[x.i]).append(" ").append(uniqWords[x.j]).append("<br />"));
+
         return sb.toString();
     }
 
@@ -163,14 +174,14 @@ public class Context {
 
     public class Col {
 
-        public Col(int i, int j, double v) {
+        public Col(int i, int j, int v) {
             this.i = i;
             this.j = j;
             this.v = v;
         }
 
         public int i, j;
-        public double v;
+        public int v;
 
         public String w() {
             return df.format(v) + " " + collocN[i][j] + " " + uniqWords[i] + " " + uniqWords[j];

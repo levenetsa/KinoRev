@@ -40,8 +40,11 @@ public class ResultService {
             logger.info("Film does NOT exist");
             filmDao.addFilm(id);
         }
-        logger.info("Downloading reviews for film " + id);
-        List<Review> reviews = reviewDao.downloadReviewsFor(id);
+        List<Review> reviews = reviewDao.getByFilmId(id);
+        if (reviews.size() == 0){
+            logger.info("Downloading reviews for film " + id);
+            reviews = reviewDao.downloadReviewsFor(id);
+        }
         logger.info("Film exists. Running script.py");
         return countResult(reviews, id);
     }
@@ -52,13 +55,20 @@ public class ResultService {
         if (reviews.size() == 0) {
             r.setText(NOT_ENOUGH_REVIEWS);
         } else {
-            //putIntoFile(reviews);
-            Context filmContext = new Context(reviews);
-            filmContext.countTScore(2,200,0.3,-1D);
-            filmContext.countUslovn(2,200,2D,-1D);
-            r.setText(filmContext.getMostCallocated());
+            try {
+                Context filmContext = new Context(reviews);
+                logger.info("context creted");
+                filmContext.countTScore(-1, 500, 0.3, -1D);
+                logger.info("t-score counted");
+                filmContext.countUslovn(-1, 500, 2D, -1D);
+                logger.info("uslovn counted");
+                r.setText(filmContext.getMostCallocated());
+                logger.info("answer counted");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        //resultDao.save(r);
+        resultDao.save(r);
         return "{\"text\": \"" + r.getText() + "\"}";
     }
 

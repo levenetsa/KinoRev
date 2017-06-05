@@ -22,8 +22,9 @@ public class ResultDao implements Dao<Result>{
     }
 
     public void save(Result r) {
-        String sql = "INSERT INTO results (film_id, text) VALUE (" +
-                r.getFilmId() + ", '" + r.getText() + "')";
+        String sql = "INSERT INTO results (film_id, text)  VALUE (" +
+                r.getFilmId() + ", '" + r.getText() + "') " +
+                "  ON DUPLICATE KEY UPDATE text = '" + r.getText() + "';";
         executeQuery(sql);
     }
 }
