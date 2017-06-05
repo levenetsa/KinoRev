@@ -47,7 +47,7 @@ public class FilmDao implements Dao<Film> {
     }
 
     public void save(Film f) {
-        String sql = "INSERT INTO results (id, name) VALUE (" +
+        String sql = "INSERT INTO films (id, name) VALUE (" +
                 f.getId() + ", '" + f.getName() + "')";
         executeQuery(sql);
     }

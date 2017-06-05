@@ -8,6 +8,9 @@ import com.levenetsa.fetcher.entity.Review;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.List;
 
 public class ResultService {
@@ -48,9 +51,22 @@ public class ResultService {
         if (reviews.size() == 0) {
             r.setText(NOT_ENOUGH_REVIEWS);
         } else {
+            putIntoFile(reviews);
             r.setText("counted");
         }
         resultDao.save(r);
         return "{\"text\": \"" + r.getText() + "\"}";
+    }
+
+    private void putIntoFile(List<Review> reviews) {
+        try {
+            PrintWriter write = new PrintWriter("input1");
+            StringBuilder content = new StringBuilder("");
+            reviews.forEach(x -> content.append(x.getContent()).append("\n"));
+            write.print(content);
+            write.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }
