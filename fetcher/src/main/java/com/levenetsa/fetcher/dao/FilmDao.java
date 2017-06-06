@@ -51,4 +51,8 @@ public class FilmDao implements Dao<Film> {
                 f.getId() + ", '" + f.getName() + "')";
         executeQuery(sql);
     }
+
+    public List<Film> getAll() {
+        return executeQuery("SELECT * FROM films;");
+    }
 }

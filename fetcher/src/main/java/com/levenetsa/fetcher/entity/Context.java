@@ -11,10 +11,10 @@ public class Context {
     DecimalFormat df;
 
     Integer uniqN;
-    int[][] colloc;
-    int[][] collocN;
-    int[][] collocUslovn;
-    int[][] collocTScore;
+    HashMap<String, Col> colloc;
+    HashMap<String, Col> collocN;
+    HashMap<String, Col> collocUslovn;
+    HashMap<String, Col> collocTScore;
     int[] word;
     String[] uniqWords;
     String[] words;
@@ -28,41 +28,42 @@ public class Context {
     public void countTScore(Integer mN, Integer N, Double mF, Double F) {
         if (tScore) return;
         if (!stats) countStats();
-        collocTScore = new int[uniqN][uniqN];
-        for (int i = 0; i < uniqN; i++) {
-            for (int j = 0; j < uniqN; j++) {
-                if ((N == -1 || word[i] < N && word[j] < N) && (mN == -1 || word[i] > mN && word[j] > mN)) {
-                    double v = getTScore(i, j);
-                    if ((mF == -1 || v >= mF) && (F == -1 || v <= F)) {
-                        collocN[i][j]++;
-                        collocTScore[i][j] = (int)(v * 100);
+        collocTScore = new HashMap<>();
+        colloc.forEach((x,y) -> {
+            if ((N == -1 || word[y.i] < N && word[y.j] < N) && (mN == -1 || word[y.i] > mN && word[y.j] > mN)) {
+                double v = getTScore(y.i, y.j);
+                if (v != 0 && (mF == -1 || v >= mF) && (F == -1 || v <= F)) {
+                    if (collocN.containsKey(x)) {collocN.get(x).v +=1;} else {
+                        collocN.put(x, new Col(y.i,y.j,1));
                     }
+                        collocTScore.put(x, new Col(y.i,y.j,(int) (v * 100)));
                 }
             }
-        }
+        });
         tScore = true;
     }
 
     private double getTScore(int i, int j) {
-        return ((double) colloc[i][j] - (((double) word[j]) * word[i]) / words.length) / Math.sqrt(colloc[i][j]);
+        if (!colloc.containsKey("" + i + '_' + j)) return 0;
+        return ((double) colloc.get("" + i + '_' + j).v - (((double) word[j]) * word[i]) / words.length) / Math.sqrt((double)colloc.get("" + i + '_' + j).v);
     }
 
 
     public void countUslovn(Integer mN, Integer N, Double mF, Double F) {
         if (uslovn) return;
         if (!stats) countStats();
-        collocUslovn = new int[uniqN][uniqN];
-        for (int i = 0; i < uniqN; i++) {
-            for (int j = 0; j < uniqN; j++) {
-                if ((N == -1 || word[i] < N && word[j] < N) && (mN == -1 || word[i] > mN && word[j] > mN)) {
-                    double v = ((double) colloc[i][j]) / word[j];
-                    if ((mF == -1 || v >= mF) && (F == -1 || v <= F)) {
-                        collocN[i][j]++;
-                        collocUslovn[i][j] = (int)(v * 100);
+        collocUslovn = new HashMap<>();
+        colloc.forEach((x,y) -> {
+            if ((N == -1 || word[y.i] < N && word[y.j] < N) && (mN == -1 || word[y.i] > mN && word[y.j] > mN)) {
+                double v = ((double) y.v) / word[y.j];
+                if (v != 0 && (mF == -1 || v >= mF) && (F == -1 || v <= F)) {
+                    if (collocN.containsKey(x)) {collocN.get(x).v +=1;} else {
+                        collocN.put(x, new Col(y.i,y.j,1));
                     }
+                    collocUslovn.put(x, new Col(y.i,y.j,(int) (v * 100)));
                 }
             }
-        }
+        });
         uslovn = true;
     }
 
@@ -78,17 +79,31 @@ public class Context {
             indexes.put(uniqWords[i], i);
         }
         word = new int[uniqN];
-        colloc = new int[uniqN][uniqN];
-        collocN = new int[uniqN][uniqN];
+        System.out.println("size " + uniqN);
+        colloc = new HashMap<>();
+        collocN = new HashMap<>();
         word[getIndex(0)]++;
         word[getIndex(words.length - 1)]++;
-        colloc[getIndex(words.length - 2)][getIndex(words.length - 1)]++;
-        colloc[getIndex(0)][getIndex(1)]++;
+        colloc.put("" + getIndex(words.length - 2) + "_" + getIndex(words.length - 1),
+                new Col(getIndex(words.length - 2) ,getIndex(words.length - 1) ,1));
+        colloc.put("" + getIndex(0) + "_" + 1, new Col(getIndex(0),1,1));
         for (int i = 1; i < words.length - 1; i++) {
-            word[getIndex(i)]++;
-            colloc[getIndex(i - 1)][getIndex(i)]++;
-            colloc[getIndex(i)][getIndex(i + 1)]++;
+            int iind = getIndex(i);
+            word[iind]++;
+            String key1 = "" + getIndex(i - 1) + '_' + iind;
+            String key2 = "" + iind + '_' + getIndex(i + 1);
+            if (colloc.containsKey(key1)) {
+                colloc.get(key1).v += 1;
+            } else {
+                colloc.put(key1, new Col(getIndex(i-1),iind,1));
+            }
+            if (colloc.containsKey(key2)) {
+                colloc.get(key2).v += 1;
+            } else {
+                colloc.put(key2, new Col(iind,getIndex(i+1),1));
+            }
         }
+        System.out.println("hash size " + colloc.size());
         applyStopWords();
         stats = true;
     }
@@ -113,7 +128,7 @@ public class Context {
                 "красивый", "мягкий", "удобный", "дорогой", "эффективный",
                 "является", "есть", "иметь", "хотеть", "содержаться", "существует",
                 "осуществлять", "оказывается", "можно",
-                "ни","P","S",
+                "ни", "P", "S",
                 "б", "г", "д", "е", "ё", "ж", "з", "й", "л", "м", "н", "п", "р", "с", "т", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", "ь", "э", "ю",
                 "Б", "Г", "Д", "Е", "Ё", "Ж", "З", "Й", "Л", "М", "Н", "П", "Р", "С", "Т", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю",
                 "один", "два", "три", "пять", "шесть", "семь", "восемь", "девять", "и", "в",
@@ -124,8 +139,10 @@ public class Context {
             Integer index = indexes.get(stop);
             if (index != null) {
                 for (int i = 0; i < uniqN; i++) {
-                    colloc[index][i] = 0;
-                    colloc[i][index] = 0;
+                    String key1 = "" + index + "_" + i;
+                    String key2 = "" + i + "_" + index;
+                    colloc.remove(key1);
+                    colloc.remove(key2);
                 }
             }
         }
@@ -134,17 +151,9 @@ public class Context {
     public String getMostCallocated() {
         StringBuilder sb = new StringBuilder("");
         List<Col> list = new ArrayList<>();
-        for (int i = 0; i < uniqN; i++) {
-            for (int j = 0; j < uniqN; j++) {
-                if (collocN[i][j] == 2) {
-                    list.add(new Col(i,j,collocTScore[i][j]));
-
-                }
-            }
-        }
-        list.stream().sorted((a,b) -> Integer.compare(b.v,a.v))
-                .limit(100).forEach(x -> sb.append(uniqWords[x.i]).append(" ").append(uniqWords[x.j]).append("<br />"));
-
+        collocN.entrySet().stream().filter(x -> x.getValue().v == 2)
+                .sorted((a,b) -> Integer.compare(collocTScore.get(b.getKey()).v,collocTScore.get(a.getKey()).v))
+                .forEach(x -> sb.append(uniqWords[x.getValue().i]).append(" ").append(uniqWords[x.getValue().j]).append("<br />"));
         return sb.toString();
     }
 
@@ -171,6 +180,16 @@ public class Context {
         return stats;
     }
 
+    public class Coup {
+
+        public Coup(int i, int j) {
+            this.i = i;
+            this.j = j;
+        }
+
+        public int i, j;
+    }
+
 
     public class Col {
 
@@ -183,9 +202,9 @@ public class Context {
         public int i, j;
         public int v;
 
-        public String w() {
-            return df.format(v) + " " + collocN[i][j] + " " + uniqWords[i] + " " + uniqWords[j];
-        }
+        // public String w() {
+        //     return df.format(v) + " " + collocN[i][j] + " " + uniqWords[i] + " " + uniqWords[j];
+        //}
     }
 }
 

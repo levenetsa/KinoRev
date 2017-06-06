@@ -6,16 +6,19 @@ import com.levenetsa.fetcher.dao.ReviewDao;
 import com.levenetsa.fetcher.entity.Context;
 import com.levenetsa.fetcher.entity.Result;
 import com.levenetsa.fetcher.entity.Review;
+import org.jsoup.HttpStatusException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class ResultService {
     private static final String NOT_ENOUGH_REVIEWS = "Not enough reviews!";
+    private static final String OK = "{\"text\": \"OK\"}";
     private Logger logger;
     private FilmDao filmDao;
     private ResultDao resultDao;
@@ -87,5 +90,47 @@ public class ResultService {
     public String recountResult(int id) {
         List<Review> reviews = reviewDao.getByFilmId(id);
         return countResult(reviews, id);
+    }
+
+    public String addFilm(int id) {
+        filmDao.addFilm(id);
+        return OK;
+    }
+
+    public String loadReviews() {
+        filmDao.getAll().forEach(film -> {
+            try {
+                logger.info("Checking " + film.getName());
+                List<Review> reviews = reviewDao.getByFilmId(film.getId());
+                if (reviews.size() == 0){
+                    logger.info("Downloading reviews for film " + film.getId());
+                    reviewDao.downloadReviewsFor(film.getId());
+                }
+                logger.info("Finished");
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+        return OK;
+    }
+
+    public String addFilms(int id1, int id2) {
+        StringBuilder result = new StringBuilder("{\"text\": \"\\n");
+        DecimalFormat df= new DecimalFormat();
+        df.setMinimumIntegerDigits(7);
+        for (int id = id1; id < id2; id++) {
+            result.append(df.format(id));
+            if(filmDao.getById(id) == null){
+                try {
+                    filmDao.addFilm(id);
+                }catch (Exception e){
+                    result.append(" Unknown exception ").append(e.getMessage()).append("\\n");
+                    e.printStackTrace();
+                }
+            }else {
+                result.append(" Film exists\\n");
+            }
+        }
+        return result.append("\"}").toString();
     }
 }
