@@ -4,6 +4,7 @@ import com.levenetsa.fetcher.dao.FilmDao;
 import com.levenetsa.fetcher.dao.ResultDao;
 import com.levenetsa.fetcher.dao.ReviewDao;
 import com.levenetsa.fetcher.entity.Context;
+import com.levenetsa.fetcher.entity.Film;
 import com.levenetsa.fetcher.entity.Result;
 import com.levenetsa.fetcher.entity.Review;
 import org.jsoup.HttpStatusException;
@@ -39,12 +40,16 @@ public class ResultService {
             return "{\"text\": \"" + result + "\"}";
         }
         logger.info("Result does NOT exist");
-        if (filmDao.getById(id) == null) {
+        Film film = filmDao.getById(id);
+        if (film == null) {
             logger.info("Film does NOT exist");
             filmDao.addFilm(id);
         }
+        if (film.getCast() == null) {
+            filmDao.updateAndSetCast(film);
+        }
         List<Review> reviews = reviewDao.getByFilmId(id);
-        if (reviews.size() == 0){
+        if (reviews.size() == 0) {
             logger.info("Downloading reviews for film " + id);
             reviews = reviewDao.downloadReviewsFor(id);
         }
@@ -63,9 +68,11 @@ public class ResultService {
                 logger.info("context creted");
                 filmContext.countTScore(-1, 500, 0.3, -1D);
                 logger.info("t-score counted");
-                filmContext.countUslovn(-1, 500, 2D, -1D);
-                logger.info("uslovn counted");
-                r.setText(filmContext.getMostCallocated());
+                //filmContext.countCValue();
+                //logger.info("C-Value counted");
+                //filmContext.countUslovn(-1, -1, -1D, -1D);
+                //logger.info("uslovn counted");
+                r.setText(filmContext.getMostCallocated("tScore"));
                 logger.info("answer counted");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -102,12 +109,12 @@ public class ResultService {
             try {
                 logger.info("Checking " + film.getName());
                 List<Review> reviews = reviewDao.getByFilmId(film.getId());
-                if (reviews.size() == 0){
+                if (reviews.size() == 0) {
                     logger.info("Downloading reviews for film " + film.getId());
                     reviewDao.downloadReviewsFor(film.getId());
                 }
                 logger.info("Finished");
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
@@ -116,18 +123,18 @@ public class ResultService {
 
     public String addFilms(int id1, int id2) {
         StringBuilder result = new StringBuilder("{\"text\": \"\\n");
-        DecimalFormat df= new DecimalFormat();
+        DecimalFormat df = new DecimalFormat();
         df.setMinimumIntegerDigits(7);
         for (int id = id1; id < id2; id++) {
             result.append(df.format(id));
-            if(filmDao.getById(id) == null){
+            if (filmDao.getById(id) == null) {
                 try {
                     filmDao.addFilm(id);
-                }catch (Exception e){
+                } catch (Exception e) {
                     result.append(" Unknown exception ").append(e.getMessage()).append("\\n");
                     e.printStackTrace();
                 }
-            }else {
+            } else {
                 result.append(" Film exists\\n");
             }
         }

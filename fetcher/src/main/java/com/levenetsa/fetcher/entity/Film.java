@@ -6,6 +6,7 @@ public class Film {
     private Integer id;
     private String name;
     private Timestamp lastFetched;
+    private String cast;
 
     public Integer getId() {
         return id;
@@ -29,6 +30,14 @@ public class Film {
 
     public void setLastFetched(Timestamp lastFetched) {
         this.lastFetched = lastFetched;
+    }
+
+    public String getCast() {
+        return cast;
+    }
+
+    public void setCast(String cast) {
+        this.cast = cast;
     }
 
     public String toJsonp() {

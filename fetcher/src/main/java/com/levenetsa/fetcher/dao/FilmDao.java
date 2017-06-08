@@ -23,6 +23,7 @@ public class FilmDao implements Dao<Film> {
         film.setId(rs.getInt("id"));
         film.setName(rs.getString("name"));
         film.setLastFetched(rs.getTimestamp("last_fetched"));
+        film.setCast(rs.getString("cast"));
         return film;
     }
 
@@ -38,17 +39,36 @@ public class FilmDao implements Dao<Film> {
 
     public void addFilm(Integer id) {
         Document document = download("https://www.kinopoisk.ru/film/" + id);
-        Element tmp = document.select("h1[class$=moviename-big]").last();//.text();
+        Element tmp = document.select("h1[class$=moviename-big]").last();
         Film film = new Film();
         film.setId(id);
         film.setName(tmp.text());
+        film.setCast(loadCast(film.getId()));
         save(film);
         logger.info(film.getName());
     }
 
+    private String loadCast(Integer id) {
+        Document document = download("https://www.kinopoisk.ru/film/" + id + "/cast/");
+        StringBuilder sb = new StringBuilder("");
+        document.select("div[class$=dub]").select("div[class$=name]").select("a").forEach(x -> sb.append(x.text()).append(' '));
+        String s = sb.toString();
+        return s.substring(0, s.length() - 1);
+    }
+
+    public  void updateAndSetCast(Film film) {
+        film.setCast(loadCast(film.getId()));
+        update(film);
+    }
+
+    private void update(Film f) {
+        String sql = "UPDATE films set cast = '" + f.getCast() + "' WHERE id = " + f.getId() + ";";
+        executeQuery(sql);
+    }
+
     public void save(Film f) {
-        String sql = "INSERT INTO films (id, name) VALUE (" +
-                f.getId() + ", '" + f.getName() + "')";
+        String sql = "INSERT INTO films (id, name, cast) VALUE (" +
+                f.getId() + ", '" + f.getName() + "','" + f.getCast() + "')";
         executeQuery(sql);
     }
 

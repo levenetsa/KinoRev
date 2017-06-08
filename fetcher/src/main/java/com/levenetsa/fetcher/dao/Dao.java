@@ -65,6 +65,8 @@ public interface Dao<T> {
     default Document download(String s) {
         Document result = null;
         try {
+            System.setProperty("http.proxyHost", "proxy.t-systems.ru"); // set proxy server
+            System.setProperty("http.proxyPort", "3128");
             result = Jsoup.connect(s).timeout(10_000).get();
         } catch (IOException e) {
             e.printStackTrace();
