@@ -54,32 +54,39 @@ public class ResultService {
             reviews = reviewDao.downloadReviewsFor(id);
         }
         logger.info("Film exists. Running script.py");
-        return countResult(reviews, id);
+        return countResult(reviews, film);
     }
 
-    private String countResult(List<Review> reviews, Integer id) {
+    private String countResult(List<Review> reviews, Film film) {
         Result r = new Result();
-        r.setFilmId(id);
+        r.setFilmId(film.getId());
         if (reviews.size() == 0) {
             r.setText(NOT_ENOUGH_REVIEWS);
         } else {
             try {
-                Context filmContext = new Context(reviews);
+                Context filmContext = new Context(reviews, film);
                 logger.info("context creted");
-                filmContext.countTScore(-1, 500, 0.3, -1D);
+                filmContext.countTScore(-1, -1, -1D, -1D);
                 logger.info("t-score counted");
                 //filmContext.countCValue();
                 //logger.info("C-Value counted");
-                //filmContext.countUslovn(-1, -1, -1D, -1D);
-                //logger.info("uslovn counted");
-                r.setText(filmContext.getMostCallocated("tScore"));
+                filmContext.countDice();
+                logger.info("dice counted");
+                filmContext.countUslovn(-1, -1, -1D, -1D);
+                logger.info("uslovn counted");
+                filmContext.countMI();
+                logger.info("MI counted");
+                r.setText("{\"tScore\":\"" + filmContext.getMostCallocated("tScore") +"\"," +
+                        "\"dice\":\"" + filmContext.getMostCallocated("dice") +"\"," +
+                        "\"mi\":\"" + filmContext.getMostCallocated("mi") +"\"," +
+                        "\"uslovn\":\"" + filmContext.getMostCallocated("uslovn") +"\"}");
                 logger.info("answer counted");
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         resultDao.save(r);
-        return "{\"text\": \"" + r.getText() + "\"}";
+        return r.getText();
     }
 
     private void putIntoFile(List<Review> reviews) {
@@ -96,7 +103,8 @@ public class ResultService {
 
     public String recountResult(int id) {
         List<Review> reviews = reviewDao.getByFilmId(id);
-        return countResult(reviews, id);
+        Film film = filmDao.getById(id);
+        return countResult(reviews, film);
     }
 
     public String addFilm(int id) {

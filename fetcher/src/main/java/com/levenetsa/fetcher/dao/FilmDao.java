@@ -49,9 +49,11 @@ public class FilmDao implements Dao<Film> {
     }
 
     private String loadCast(Integer id) {
-        Document document = download("https://www.kinopoisk.ru/film/" + id + "/cast/");
+        String url = "https://www.kinopoisk.ru/film/" + id + "/cast/";
+        Document document = download(url);
+        logger.info("Fetching cast from " + url);
         StringBuilder sb = new StringBuilder("");
-        document.select("div[class$=dub]").select("div[class$=name]").select("a").forEach(x -> sb.append(x.text()).append(' '));
+        document.select("div[class$=info]").select("div[class$=name]").select("a").forEach(x -> sb.append(x.text()).append(' '));
         String s = sb.toString();
         return s.substring(0, s.length() - 1);
     }
