@@ -15,6 +15,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ResultService {
@@ -65,21 +67,73 @@ public class ResultService {
         } else {
             try {
                 Context filmContext = new Context(reviews, film);
+                List<Review> g = new ArrayList<>();
+                List<Review> n = new ArrayList<>();
+                List<Review> b = new ArrayList<>();
+                reviews.forEach(re ->{
+                    if (re.getMood().equals("good"))
+                            g.add(re);
+                    if (re.getMood().equals("bad"))
+                            b.add(re);
+                    if (re.getMood().equals("response"))
+                            n.add(re);
+
+                });
                 logger.info("context creted");
-                filmContext.countTScore(-1, -1, -1D, -1D);
-                logger.info("t-score counted");
+                //filmContext.countTScore(-1, -1, -1D, -1D);
+                //logger.info("t-score counted");
                 //filmContext.countCValue();
                 //logger.info("C-Value counted");
-                filmContext.countDice();
-                logger.info("dice counted");
-                filmContext.countUslovn(-1, -1, -1D, -1D);
-                logger.info("uslovn counted");
-                filmContext.countMI();
-                logger.info("MI counted");
-                r.setText("{\"tScore\":\"" + filmContext.getMostCallocated("tScore") +"\"," +
-                        "\"dice\":\"" + filmContext.getMostCallocated("dice") +"\"," +
-                        "\"mi\":\"" + filmContext.getMostCallocated("mi") +"\"," +
-                        "\"uslovn\":\"" + filmContext.getMostCallocated("uslovn") +"\"}");
+                //filmContext.countDice();
+                //logger.info("dice counted");
+                //filmContext.countUslovn(-1, -1, -1D, -1D);
+                //logger.info("uslovn counted");
+                //filmContext.countMI();
+                //logger.info("MI counted");
+                Context gk = new Context(g,film);
+                gk.setReviews(g);
+                gk.countTScore(-1,-1,-1D,-1D);
+                List<String> good = gk.getMostCallocatedVal("tScore");
+                Context nk = new Context(n,film);
+                nk.setReviews(n);
+                nk.countTScore(-1,-1,-1D,-1D);
+                List<String> neut = nk.getMostCallocatedVal("tScore");
+                Context bk = new Context(b,film);
+                bk.setReviews(b);
+                bk.countTScore(-1,-1,-1D,-1D);
+                List<String> bad= bk.getMostCallocatedVal("tScore");
+                ArrayList<String> badgood = new ArrayList<>(bad);
+                ArrayList<String> badneut = new ArrayList<>(bad);
+                ArrayList<String> goodneut = new ArrayList<>(good);
+                badgood.retainAll(badneut);
+                badgood.retainAll(goodneut);
+                /*ArrayList<String> goodbad = new ArrayList<>(good);
+                ArrayList<String> neutbad = new ArrayList<>(neut);
+                ArrayList<String> neutgood = new ArrayList<>(neut);
+                goodbad.retainAll(bad);
+                goodbad.retainAll(neut);
+                neutbad.retainAll(bad);
+                neutbad.retainAll(good);
+                badgood.retainAll(good);
+                badgood.retainAll(neut);
+                HashMap<String,Boolean> goode = new HashMap<>();
+                HashMap<String,Boolean> bade = new HashMap<>();
+                HashMap<String,Boolean> neute = new HashMap<>();
+                goodbad.forEach(x->goode.put(x,true));
+                neutbad.forEach(x->neute.put(x,true));
+                badgood.forEach(x->bade.put(x,true));
+                logger.info("Mood counted");*/
+                HashMap<String,Boolean> goode = new HashMap<>();
+                badgood.forEach(x->goode.put(x,false));
+                StringBuilder gS = new StringBuilder("");
+                good.stream().filter(x->!goode.containsKey(x)).forEach(x->gS.append(x).append("<br />"));
+                StringBuilder bS = new StringBuilder("");
+                bad.stream().filter(x->!goode.containsKey(x)).forEach(x->bS.append(x).append("<br />"));
+                StringBuilder nS = new StringBuilder("");
+                neut.stream().filter(x->!goode.containsKey(x)).forEach(x->nS.append(x).append("<br />"));
+                r.setText("{\"good\":\"" + gS.toString() +"\"," +
+                        "\"neut\":\"" + nS.toString() +"\"," +
+                        "\"bad\":\"" + bS.toString() +"\"}");
                 logger.info("answer counted");
             } catch (Exception e) {
                 e.printStackTrace();

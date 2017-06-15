@@ -2,6 +2,7 @@ package com.levenetsa.fetcher.entity;
 
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Context {
     private List<Review> reviews;
@@ -298,6 +299,12 @@ public class Context {
 
     public Boolean isStatsCounted() {
         return stats;
+    }
+
+    public List<String> getMostCallocatedVal(String tScore) {
+        return  collocTScore.entrySet().stream()
+                .sorted((a, b) -> Double.compare(b.getValue().v, a.getValue().v))
+                .map(x -> uniqWords[x.getValue().i]+ " " + uniqWords[x.getValue().j] + " ").collect(Collectors.toList());
     }
 
     public class Coup {
