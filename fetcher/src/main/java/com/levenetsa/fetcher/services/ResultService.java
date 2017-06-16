@@ -18,6 +18,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ResultService {
     private static final String NOT_ENOUGH_REVIEWS = "Not enough reviews!";
@@ -39,7 +40,7 @@ public class ResultService {
         String result = resultDao.getById(id);
         if (result != null) {
             logger.info("Result already exists");
-            return "{\"text\": \"" + result + "\"}";
+            return result;
         }
         logger.info("Result does NOT exist");
         Film film = filmDao.getById(id);
@@ -75,7 +76,7 @@ public class ResultService {
                             g.add(re);
                     if (re.getMood().equals("bad"))
                             b.add(re);
-                    if (re.getMood().equals("response"))
+                    if (re.getMood().equals("response") || re.getMood().equals("neut"))
                             n.add(re);
 
                 });
@@ -102,37 +103,39 @@ public class ResultService {
                 bk.setReviews(b);
                 bk.countTScore(-1,-1,-1D,-1D);
                 List<String> bad= bk.getMostCallocatedVal("tScore");
-                ArrayList<String> badgood = new ArrayList<>(bad);
-                ArrayList<String> badneut = new ArrayList<>(bad);
-                ArrayList<String> goodneut = new ArrayList<>(good);
-                badgood.retainAll(badneut);
-                badgood.retainAll(goodneut);
-                /*ArrayList<String> goodbad = new ArrayList<>(good);
-                ArrayList<String> neutbad = new ArrayList<>(neut);
-                ArrayList<String> neutgood = new ArrayList<>(neut);
-                goodbad.retainAll(bad);
-                goodbad.retainAll(neut);
-                neutbad.retainAll(bad);
-                neutbad.retainAll(good);
-                badgood.retainAll(good);
-                badgood.retainAll(neut);
-                HashMap<String,Boolean> goode = new HashMap<>();
-                HashMap<String,Boolean> bade = new HashMap<>();
-                HashMap<String,Boolean> neute = new HashMap<>();
-                goodbad.forEach(x->goode.put(x,true));
-                neutbad.forEach(x->neute.put(x,true));
-                badgood.forEach(x->bade.put(x,true));
-                logger.info("Mood counted");*/
-                HashMap<String,Boolean> goode = new HashMap<>();
-                badgood.forEach(x->goode.put(x,false));
+                HashMap<String,Boolean> all = new HashMap<>();
+                good.forEach(x->all.put(x,false));
+                neut.forEach(x->{
+                    if (all.containsKey(x)){
+                        all.put(x,true);
+                    }
+                    else{
+                        all.put(x,false);
+                    }
+                });
+                bad.forEach(x->{
+                    if (all.containsKey(x)){
+                        all.put(x,true);
+                    }
+                    else{
+                        all.put(x,false);
+                    }
+                });
+                Context allk = new Context(g,film);
+                allk.setReviews(g);
+                allk.countTScore(-1,-1,-1D,-1D);
+                String allrev = gk.getMostCallocated("tScore");
+
+
                 StringBuilder gS = new StringBuilder("");
-                good.stream().filter(x->!goode.containsKey(x)).forEach(x->gS.append(x).append("<br />"));
+                good.stream().filter(x->!all.get(x)).limit(20).forEach(x->gS.append(x).append("<br />"));
                 StringBuilder bS = new StringBuilder("");
-                bad.stream().filter(x->!goode.containsKey(x)).forEach(x->bS.append(x).append("<br />"));
+                bad.stream().filter(x->!all.get(x)).limit(20).forEach(x->bS.append(x).append("<br />"));
                 StringBuilder nS = new StringBuilder("");
-                neut.stream().filter(x->!goode.containsKey(x)).forEach(x->nS.append(x).append("<br />"));
+                neut.stream().filter(x->!all.get(x)).limit(20).forEach(x->nS.append(x).append("<br />"));
                 r.setText("{\"good\":\"" + gS.toString() +"\"," +
                         "\"neut\":\"" + nS.toString() +"\"," +
+                        "\"all\":\"" + allrev +"\"," +
                         "\"bad\":\"" + bS.toString() +"\"}");
                 logger.info("answer counted");
             } catch (Exception e) {
@@ -167,6 +170,7 @@ public class ResultService {
     }
 
     public String loadReviews() {
+
         filmDao.getAll().forEach(film -> {
             try {
                 logger.info("Checking " + film.getName());
@@ -179,6 +183,12 @@ public class ResultService {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            try {
+                TimeUnit.SECONDS.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         });
         return OK;
     }

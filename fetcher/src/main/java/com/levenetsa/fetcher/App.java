@@ -10,10 +10,10 @@ public class App {
         port(22456);
         ResultService resultService = new ResultService();
         SearchService searchService = new SearchService();
-        get("addfilm/:id", (req, res) -> resultService.addFilm(Integer.parseInt(req.params(":id"))));
-        get("addfilms/:id/:last", (req, res) -> resultService.addFilms(Integer.parseInt(req.params(":id")),
+        get("/addfilm/:id", (req, res) -> resultService.addFilm(Integer.parseInt(req.params(":id"))));
+        get("/addfilms/:id/:last", (req, res) -> resultService.addFilms(Integer.parseInt(req.params(":id")),
                 Integer.parseInt(req.params(":last"))));
-        get("loadreviews", (req, res) -> resultService.loadReviews());
+        get("/loadreviews", (req, res) -> resultService.loadReviews());
         get("/:id", (req, res) -> resultService.getResult(Integer.parseInt(req.params(":id"))));
         get("/recount/:id", (req, res) -> resultService.recountResult(Integer.parseInt(req.params(":id"))));
         get("/s/:name", (req, res) -> searchService.getResult(req.params(":name")));
